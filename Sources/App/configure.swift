@@ -15,7 +15,11 @@ public func configure(_ app: Application) throws {
         database: Environment.get("DATABASE_NAME") ?? "vapor_database"
     ), as: .psql)
 
-    app.migrations.add(CreateTodo())
+    // 添加 Acronym 的迁移方法
+    app.migrations.add(CreateAcronym())
+
+    // 设置日志级别为 debug
+    app.logger.logLevel = .debug
 
     // register routes
     try routes(app)

@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug Run",
+      "program": "${workspaceFolder:TILApp}/.build/debug/Run",
+      "args": [],
+      "cwd": "${workspaceFolder:TILApp}",
+      "preLaunchTask": "swift: Build Debug Run"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Release Run",
+      "program": "${workspaceFolder:TILApp}/.build/release/Run",
+      "args": [],
+      "cwd": "${workspaceFolder:TILApp}",
+      "preLaunchTask": "swift: Build Release Run"
+    }
+  ]
+}
