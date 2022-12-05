@@ -16,7 +16,10 @@ public func configure(_ app: Application) throws {
     ), as: .psql)
 
     // 添加 Acronym 的迁移方法
+    app.migrations.add(CreateUser())
     app.migrations.add(CreateAcronym())
+    app.migrations.add(CreateCategory())
+    app.migrations.add(CreateAcronymCategoryPivot())
 
     // 设置日志级别为 debug
     app.logger.logLevel = .debug
