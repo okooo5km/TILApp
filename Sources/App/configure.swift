@@ -1,11 +1,12 @@
 import Fluent
 import FluentPostgresDriver
 import Vapor
+import Leaf
 
 // configures your application
 public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
-    // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+    app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
     app.databases.use(.postgres(
         hostname: Environment.get("DATABASE_HOST") ?? "localhost",
@@ -23,6 +24,8 @@ public func configure(_ app: Application) throws {
 
     // 设置日志级别为 debug
     app.logger.logLevel = .debug
+
+    app.views.use(.leaf)
 
     // register routes
     try routes(app)
