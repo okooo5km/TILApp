@@ -7,6 +7,8 @@ struct WebsiteController: RouteCollection {
         routes.get("acronyms", ":acronymID", use: acronym)
         routes.get("users", ":userID", use: user)
         routes.get("users", use: allUsers)
+        routes.get("categories", use: allCategories)
+        routes.get("categories", ":categoryID", use: category)
     }
 
     func index(_ req: Request) async throws -> View {
@@ -38,6 +40,21 @@ struct WebsiteController: RouteCollection {
         let context = AllUsersContext(title: "All Users", users: users)
         return try await req.view.render("allUsers", context)
     }
+
+    func allCategories(_ req: Request) async throws -> View {
+        let categories = try await Category.query(on: req.db).all()
+        let context = AllCategoriesContext(title: "All Categories", categories: categories)
+        return try await req.view.render("allCategories", context)
+    }
+
+    func category(_ req: Request) async throws -> View {
+        guard let category = try await Category.find(req.parameters.get("categoryID"), on: req.db) else {
+            throw Abort(.notFound)
+        } 
+        let acronyms = try await category.$acronyms.get(on: req.db)
+        let context = CategoryContext(title: category.name, category: category, acronyms: acronyms)
+        return try await req.view.render("category", context)
+    }
 }
 
 struct IndexContext: Encodable {
@@ -60,4 +77,15 @@ struct UserContext: Encodable {
 struct AllUsersContext: Encodable {
     let title: String
     let users: [User]
+}
+
+struct AllCategoriesContext: Encodable {
+    let title: String
+    let categories: [Category]
+}
+
+struct CategoryContext: Encodable {
+    let title: String
+    let category: Category
+    let acronyms: [Acronym]
 }
