@@ -9,6 +9,8 @@ struct WebsiteController: RouteCollection {
         routes.get("users", use: allUsers)
         routes.get("categories", use: allCategories)
         routes.get("categories", ":categoryID", use: category)
+        routes.get("acronyms", "create", use: createAcronym)
+        routes.post("acronyms", "create", use: createAcronymPost)
     }
 
     func index(_ req: Request) async throws -> View {
@@ -55,6 +57,22 @@ struct WebsiteController: RouteCollection {
         let context = CategoryContext(title: category.name, category: category, acronyms: acronyms)
         return try await req.view.render("category", context)
     }
+
+    func createAcronym(_ req: Request) async throws -> View {
+        let users = try await User.query(on: req.db).all()
+        let context = CreateAcronymContext(users: users)
+        return try await req.view.render("createAcronym", context)
+    }
+
+    func createAcronymPost(_ req: Request) async throws -> Response {
+        let createData = try req.content.decode(CreateAcronymData.self)
+        let acronym = Acronym(short: createData.short, long: createData.long, userID: createData.userID)
+        try await acronym.save(on: req.db)
+        guard let acronymID = acronym.id else {
+            throw Abort(.internalServerError)
+        }
+        return req.redirect(to: "/acronyms/\(acronymID)")
+    }
 }
 
 struct IndexContext: Encodable {
@@ -88,4 +106,9 @@ struct CategoryContext: Encodable {
     let title: String
     let category: Category
     let acronyms: [Acronym]
+}
+
+struct CreateAcronymContext: Encodable {
+    let title: String = "Create An acronym"
+    let users: [User]
 }
